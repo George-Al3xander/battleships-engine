@@ -1,0 +1,30 @@
+{
+    "name": "battleships-engine",
+    "license": "MIT",
+    "main": "dist/index.js",
+    "module": "dist/index.mjs",
+    "types": "dist/index.dt.ts",
+    "scripts": {
+        "build": "tsup src/index.ts --format cjs,esm --dts",
+        "lint": "tsc",
+        "format": "pnpm exec prettier --write",
+        "test": "jest"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.9.1",
+        "@types/jest": "^29.5.12",
+        "@types/lodash": "^4.17.7",
+        "eslint": "^9.9.1",
+        "globals": "^15.9.0",
+        "jest": "^29.7.0",
+        "prettier": "3.3.3",
+        "ts-jest": "^29.2.5",
+        "ts-node": "^10.9.2",
+        "tsup": "^8.2.4",
+        "typescript": "^5.5.4",
+        "typescript-eslint": "^8.3.0"
+    },
+    "dependencies": {
+        "lodash": "^4.17.21"
+    }
+}
