@@ -1,6 +1,7 @@
 {
     "name": "battleships-engine",
     "license": "MIT",
+    "version": "0.0.1",
     "main": "dist/index.js",
     "module": "dist/index.mjs",
     "types": "dist/index.dt.ts",
@@ -11,6 +12,7 @@
         "test": "jest"
     },
     "devDependencies": {
+        "@changesets/cli": "^2.27.7",
         "@eslint/js": "^9.9.1",
         "@types/jest": "^29.5.12",
         "@types/lodash": "^4.17.7",
