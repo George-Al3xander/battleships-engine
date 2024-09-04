@@ -1,72 +1,78 @@
 import { shipsLength } from "@/consts";
 import Ship from "@/ship";
-import some from "lodash/some";
-import isEqual from "lodash/isEqual";
-import filter from "lodash/filter";
-import { Coords, Direction, ShipType } from "@/types/type";
+
+import { TCoords, Direction, ShipType } from "@/types/type";
+import { generateGameBoardCells } from "@/utils";
+import Coords from "@/coords";
 
 export default class GameBoard {
-    ships: {
-        [K in ShipType]?: Ship;
-    } = {};
-    missed: Coords[] = [];
+    ships: Map<ShipType, Ship> = new Map();
+    takenCells: Map<string, ShipType> = new Map();
+    missed: Map<string, boolean> = generateGameBoardCells();
+
+    constructor(ships?: Map<ShipType, Ship>) {
+        if (ships) {
+            this.ships = ships;
+            this.ships.forEach((...params) =>
+                this.fillTakenCellsWithShip(...params),
+            );
+        }
+    }
+
+    private fillTakenCellsWithShip(
+        ship: Ship,
+        shipType: ShipType,
+        _map?: Map<ShipType, Ship>,
+    ) {
+        for (const coord of ship)
+            this.takenCells.set(coord.toString(), shipType);
+    }
 
     inspectCoordsInShips({
-        coords,
+        coords: paramCoords,
         missCb,
         matchCb,
     }: {
-        coords: Coords;
+        coords: TCoords;
         matchCb: (ship: Ship) => void;
         missCb: () => void;
     }) {
-        const currShips = Object.keys(this.ships);
-        if (currShips.length > 0)
-            currShips.forEach((shipType) => {
-                const ship = this.ships[shipType as ShipType];
+        if (this.ships.size > 0) {
+            const coords = new Coords(paramCoords);
+            const shipType = this.takenCells.get(coords.toString());
+
+            if (shipType) {
+                const ship = this.ships.get(shipType);
                 if (!ship) throw new Error(`${shipType} does not exist`);
-                let isMatch = false;
-
-                for (let i = 0; i < ship.length; i++) {
-                    if (
-                        (ship.direction === "hor" &&
-                            isEqual(
-                                { y: ship.coords.y, x: ship.coords.x + i },
-                                coords,
-                            )) ||
-                        (ship.direction === "vert" &&
-                            isEqual(
-                                { y: ship.coords.y + i, x: ship.coords.x },
-                                coords,
-                            ))
-                    ) {
-                        isMatch = true;
-
-                        break;
-                    }
-                }
-
-                if (isMatch) matchCb(ship);
-                else missCb();
-            });
-        else missCb();
+                matchCb(ship);
+            } else missCb();
+        } else missCb();
     }
 
-    placeShip({
+    public placeShip({
         shipType,
         ...params
     }: {
         shipType: ShipType;
-        coords: Coords;
+        coords: TCoords;
         direction: Direction;
     }) {
         this.inspectCoordsInShips({
             coords: params.coords,
             missCb: () => {
-                this.ships[shipType] = new Ship({
+                const newShip = new Ship({
                     length: shipsLength[shipType],
                     ...params,
                 });
+                for (const coords of newShip) {
+                    if (this.takenCells.has(coords.toString())) {
+                        throw new Error(
+                            "Ship placement error: The ship overlaps with another ship.",
+                        );
+                    }
+                }
+                this.ships.set(shipType, newShip);
+                this.fillTakenCellsWithShip(newShip, shipType);
             },
             matchCb: () => {
                 throw new Error(
@@ -76,28 +82,27 @@ export default class GameBoard {
         });
     }
 
-    receiveAttack(coords: Coords) {
-        if (some(this.missed, coords))
+    public receiveAttack(coords: TCoords) {
+        const coordsClass = new Coords(coords);
+        if (this.missed.get(coordsClass.toString()) === true)
             throw new Error(
                 `The coordinate (X: ${coords.x}, Y: ${coords.y}) has already been targeted and missed.`,
             );
 
-        this.inspectCoordsInShips({
-            coords: coords,
-            matchCb: (ship) => ship.hit(),
-            missCb: () => {
-                if (some(this.missed, coords))
-                    this.missed = filter(this.missed, coords);
-                else this.missed.push(coords);
-            },
-        });
+        const fromTaken = this.takenCells.get(coordsClass.toString());
+        if (fromTaken) {
+            const ship = this.ships.get(fromTaken);
+
+            if (!ship) throw new Error(`${fromTaken} does not exist`);
+            else ship.hit();
+        } else this.missed.set(coordsClass.toString(), true);
     }
 
-    hasLost() {
-        const currShips = Object.keys(this.ships);
+    public hasLost() {
+        const currShips = Array.from(this.ships.keys());
         if (currShips.length > 0) {
             return !currShips
-                .map((ship) => this.ships[ship as ShipType]?.isSunk())
+                .map((ship) => this.ships.get(ship)?.isSunk())
                 .includes(false);
         } else return false;
     }

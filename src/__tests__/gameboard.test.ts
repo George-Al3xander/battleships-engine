@@ -1,7 +1,6 @@
 import GameBoard from "@/gameboard";
 import Ship from "@/ship";
-import { after } from "lodash";
-import { Coords, ShipType } from "@/types/type";
+import { ShipType, TCoords } from "@/types/type";
 import { shipsLength } from "@/consts";
 
 describe("GameBoard", () => {
@@ -14,13 +13,105 @@ describe("GameBoard", () => {
             direction: "hor",
         });
 
-        expect(gameboard.ships["cruiser"]).toBeInstanceOf(Ship);
-        expect(gameboard.ships["cruiser"]).toHaveProperty("coords");
-        expect(gameboard.ships["cruiser"]).toHaveProperty("direction");
-        expect(gameboard.ships["cruiser"]?.coords.x).toBe(1);
-        expect(gameboard.ships["cruiser"]?.coords.y).toBe(4);
-        expect(gameboard.ships["cruiser"]?.direction).toBe("hor");
+        expect(gameboard.ships.get("cruiser")).toBeInstanceOf(Ship);
+        expect(gameboard.ships.get("cruiser")).toHaveProperty("coords");
+        expect(gameboard.ships.get("cruiser")).toHaveProperty("direction");
+        expect(gameboard.ships.get("cruiser")?.coords.x).toBe(1);
+        expect(gameboard.ships.get("cruiser")?.coords.y).toBe(4);
+        expect(gameboard.ships.get("cruiser")?.direction).toBe("hor");
     });
+
+    it("should throw the ship overlap error", () => {
+        const gameboard = new GameBoard();
+
+        gameboard.placeShip({
+            shipType: "cruiser",
+            coords: { x: 1, y: 4 },
+            direction: "hor",
+        });
+
+        try {
+            gameboard.placeShip({
+                shipType: "cruiser",
+                coords: { x: 2, y: 4 },
+                direction: "vert",
+            });
+            expect(1).toBe(2);
+        } catch (e) {
+            expect(e instanceof Error ? e.message : "Bad").toBe(
+                "Ship placement error: The ship overlaps with another ship.",
+            );
+        }
+    });
+
+    describe("utils", () => {
+        it("should fill taken cells with  ship coordinates", () => {
+            const gameboard = new GameBoard();
+            const size = 5;
+            expect(gameboard.takenCells.size).toBe(0);
+            const ship = new Ship({
+                length: size,
+                coords: { x: 1, y: 4 },
+                direction: "hor",
+            });
+            for (let i = 0; i < size; i++) {
+                (gameboard as any).fillTakenCellsWithShip(
+                    ship,
+                    "aircraft_carrier",
+                );
+            }
+            for (const coord of ship) {
+                expect(gameboard.takenCells.has(coord.toString())).toBe(true);
+            }
+            expect(gameboard.takenCells.size).toBe(size);
+        });
+
+        it("should inspect", () => {
+            const gameboard = new GameBoard(
+                new Map([
+                    [
+                        "cruiser",
+                        new Ship({
+                            length: 2,
+                            direction: "hor",
+                            coords: { x: 1, y: 1 },
+                        }),
+                    ],
+                    [
+                        "battleship",
+                        new Ship({
+                            length: 4,
+                            direction: "vert",
+                            coords: { x: 1, y: 4 },
+                        }),
+                    ],
+                ]),
+            );
+            const matchCb = jest.fn();
+            const missCb = jest.fn();
+            (gameboard as any).inspectCoordsInShips({
+                coords: { x: 1, y: 1 },
+                matchCb,
+                missCb,
+            });
+
+            (gameboard as any).inspectCoordsInShips({
+                coords: { x: 1, y: 5 },
+                matchCb,
+                missCb,
+            });
+
+            (gameboard as any).inspectCoordsInShips({
+                coords: { x: 9, y: 9 },
+                matchCb,
+                missCb,
+            });
+
+            expect(missCb).toHaveBeenCalledTimes(1);
+            expect(matchCb).toHaveBeenCalledTimes(2);
+        });
+    });
+
     describe("receiveAttack", () => {
         let gameboard: GameBoard | null = null;
         beforeEach(() => {
@@ -43,7 +134,7 @@ describe("GameBoard", () => {
                 direction: "hor",
             });
 
-            jest.spyOn(gameboard.ships["cruiser"]!, "hit");
+            jest.spyOn(gameboard.ships.get("cruiser")!, "hit");
             jest.spyOn(gameboard, "receiveAttack");
 
             gameboard.receiveAttack({ x: 2, y: 1 });
@@ -62,16 +153,17 @@ describe("GameBoard", () => {
         });
         afterEach(() => jest.clearAllMocks());
         it("should call the hit function after the successful receiveAttack call", () => {
-            expect(gameboard!.ships["cruiser"]?.hit).toHaveBeenCalledTimes(2);
+            const ship = gameboard!.ships.get("cruiser")!;
+            expect(ship.hit).toHaveBeenCalledTimes(ship.length);
             expect(gameboard!.receiveAttack).toHaveBeenCalledTimes(10);
         });
 
         it("should sunk the ship", () => {
-            expect(gameboard!.ships["cruiser"]?.isSunk()).toBe(true);
-            expect(gameboard!.ships["cruiser"]?.beenHitTimes).toBe(2);
+            expect(gameboard!.ships.get("cruiser")?.isSunk()).toBe(true);
+            expect(gameboard!.ships.get("cruiser")?.beenHitTimes).toBe(2);
         });
         it("should add the coordinates to the 'missed' array", () => {
-            expect(gameboard!.missed).toHaveLength(1);
+            expect(gameboard!.missed.get("(4,10)")).toBe(true);
         });
     });
 
@@ -79,7 +171,7 @@ describe("GameBoard", () => {
         it("should report whether or not all of the ships have been sunk.", () => {
             const gameboard = new GameBoard();
 
-            const ships: { type: ShipType; coords: Coords }[] = [
+            const ships: { type: ShipType; coords: TCoords }[] = [
                 {
                     type: "cruiser",
                     coords: { x: 1, y: 1 },

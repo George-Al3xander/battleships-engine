@@ -7,7 +7,7 @@ export type ShipType =
 
 export type Direction = "hor" | "vert";
 
-export type Coords = {
+export type TCoords = {
     x: number;
     y: number;
 };
