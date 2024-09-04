@@ -63,7 +63,7 @@ describe("Ship class", () => {
 
     it("should have default properties", () => {
         const ship = new Ship({
-            coords: { x: 0, y: 4 },
+            coords: { x: 1, y: 4 },
             length: 4,
             direction: "hor",
         });
@@ -81,10 +81,38 @@ describe("Ship class", () => {
         );
     });
 
+    it("should iterate through the coordinates", () => {
+        const ship_1 = new Ship({
+            direction: "hor",
+            length: 4,
+            coords: { x: 1, y: 1 },
+        });
+
+        const ship_2 = new Ship({
+            direction: "vert",
+            length: 2,
+            coords: { x: 1, y: 3 },
+        });
+
+        [...ship_1].forEach((coords, index) => {
+            expect(coords).toMatchObject({
+                x: ship_1.coords.x + index,
+                y: ship_1.coords.y,
+            });
+        });
+
+        [...ship_2].forEach((coords, index) => {
+            expect(coords).toMatchObject({
+                x: ship_2.coords.x,
+                y: ship_2.coords.y + index,
+            });
+        });
+    });
+
     it("should change isSunk after ship been fully hit", () => {
         const length = 4;
         const ship = new Ship({
-            coords: { x: 0, y: 4 },
+            coords: { x: 1, y: 4 },
             length,
             direction: "hor",
         });
