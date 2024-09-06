@@ -68,3 +68,26 @@ export const convertStringToCoords = (str: string): TCoords => {
     if (!x || !y) throw new Error("Invalid string provided");
     return { x, y };
 };
+
+export const isGameboardValid = (gameboard: GameBoard) => {
+    let isMatch = false;
+    if (gameboard.ships.size <= 4) return false;
+    else {
+        gameboard.ships.forEach((currentShip, currentShipType) => {
+            for (const [anyShipType, anyShip] of gameboard.ships.entries()) {
+                if (currentShipType != anyShipType) {
+                    for (const anyShipCoords of anyShip) {
+                        for (const currentShipCoords of currentShip) {
+                            isMatch =
+                                anyShipCoords.toString() !==
+                                currentShipCoords.toString();
+                            if (isMatch) break;
+                        }
+                        if (isMatch) break;
+                    }
+                }
+            }
+        });
+    }
+    return isMatch;
+};

@@ -1,5 +1,11 @@
 import GameBoard from "@/gameboard";
-import { convertStringToCoords, generateRandomShip } from "@/utils";
+import {
+    convertStringToCoords,
+    generateRandomShip,
+    isGameboardValid,
+} from "@/utils";
+import Player from "@/player";
+import Ship from "@/ship";
 
 const repeatTestTimes = (cb: Function, count: number | undefined = 5) => {
     for (let i = 0; i < count; i++) {
@@ -50,4 +56,53 @@ it("should convert string to a coords object", () => {
     expect(() => convertStringToCoords("bad string")).toThrow(
         "Invalid string provided",
     );
+});
+
+it("should check gameboard", () => {
+    const gameboard = new GameBoard(
+        new Map([
+            [
+                "cruiser",
+                new Ship({
+                    length: 2,
+                    direction: "hor",
+                    coords: { x: 1, y: 1 },
+                }),
+            ],
+            [
+                "battleship",
+                new Ship({
+                    length: 4,
+                    direction: "vert",
+                    coords: { x: 1, y: 4 },
+                }),
+            ],
+            [
+                "aircraft_carrier",
+                new Ship({
+                    length: 5,
+                    direction: "hor",
+                    coords: { x: 1, y: 6 },
+                }),
+            ],
+            [
+                "destroyer",
+                new Ship({
+                    length: 3,
+                    direction: "vert",
+                    coords: { x: 6, y: 1 },
+                }),
+            ],
+            [
+                "submarine",
+                new Ship({
+                    length: 3,
+                    direction: "hor",
+                    coords: { x: 8, y: 4 },
+                }),
+            ],
+        ]),
+    );
+
+    expect(isGameboardValid(gameboard)).toBe(true);
 });
