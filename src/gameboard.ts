@@ -1,9 +1,15 @@
-import { shipsLength } from "@/consts";
+import { directionTypes, shipsLength } from "@/consts";
 import Ship from "@/ship";
 
 import { TCoords, Direction, ShipType } from "@/types/type";
-import { generateGameBoardCells } from "@/utils";
+import {
+    convertStringToCoords,
+    generateGameBoardCells,
+    generateRandomDir,
+    generateRandomShip,
+} from "@/utils";
 import Coords from "@/coords";
+import random from "lodash/random";
 
 export default class GameBoard {
     ships: Map<ShipType, Ship> = new Map();
@@ -16,7 +22,7 @@ export default class GameBoard {
             this.ships.forEach((...params) =>
                 this.fillTakenCellsWithShip(...params),
             );
-        }
+        } else this.randomlyPlaceShips();
     }
 
     private fillTakenCellsWithShip(
@@ -105,5 +111,73 @@ export default class GameBoard {
                 .map((ship) => this.ships.get(ship)?.isSunk())
                 .includes(false);
         } else return false;
+    }
+
+    public randomlyPlaceShip({
+        shipType,
+        direction = generateRandomDir(),
+    }: {
+        shipType: ShipType;
+        direction?: Direction;
+    }) {
+        if (this.takenCells.size > 0) {
+            const allCells = generateGameBoardCells();
+            const emptyCells: string[] = [];
+            for (const [cell] of allCells) {
+                if (!this.takenCells.has(cell)) emptyCells.push(cell);
+            }
+
+            const shipLength = shipsLength[shipType];
+
+            const possibleStarts = emptyCells.filter((str) => {
+                const { x, y } = convertStringToCoords(str);
+                const newShip = new Ship({
+                    coords: { x, y },
+                    direction,
+                    length: shipLength,
+                });
+                let isValid = true;
+
+                if (direction === "hor") isValid = x + shipLength <= 10;
+                else isValid = y + shipLength <= 10;
+
+                if (isValid) {
+                    for (const coord of newShip) {
+                        isValid = !this.takenCells.has(coord.toString());
+                        if (!isValid) break;
+                    }
+                } else {
+                    return false;
+                }
+                return isValid;
+            });
+
+            if (possibleStarts.length === 0) {
+                this.randomlyPlaceShip({
+                    shipType,
+                    direction: directionTypes.find((dir) => dir !== direction),
+                });
+            } else {
+                const randomStart =
+                    possibleStarts[random(possibleStarts.length - 1)];
+
+                if (!randomStart) throw new Error("No available space");
+
+                this.placeShip({
+                    shipType,
+                    coords: convertStringToCoords(randomStart),
+                    direction,
+                });
+            }
+        } else {
+            generateRandomShip({ gameboard: this, shipType });
+        }
+    }
+
+    randomlyPlaceShips() {
+        this.ships = new Map();
+        (Object.keys(shipsLength) as ShipType[]).forEach((shipType) =>
+            this.randomlyPlaceShip({ shipType }),
+        );
     }
 }

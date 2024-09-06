@@ -2,11 +2,13 @@ import GameBoard from "@/gameboard";
 import Ship from "@/ship";
 import { ShipType, TCoords } from "@/types/type";
 import { shipsLength } from "@/consts";
+import Player from "@/player";
+import { isGameboardValid } from "@/utils";
 
 describe("GameBoard", () => {
     it("should place a ship", () => {
         const gameboard = new GameBoard();
-
+        gameboard.ships = new Map();
         gameboard.placeShip({
             shipType: "cruiser",
             coords: { x: 1, y: 4 },
@@ -23,7 +25,7 @@ describe("GameBoard", () => {
 
     it("should throw the ship overlap error", () => {
         const gameboard = new GameBoard();
-
+        gameboard.ships = new Map();
         gameboard.placeShip({
             shipType: "cruiser",
             coords: { x: 1, y: 4 },
@@ -47,7 +49,9 @@ describe("GameBoard", () => {
     describe("utils", () => {
         it("should fill taken cells with  ship coordinates", () => {
             const gameboard = new GameBoard();
+            gameboard.ships = new Map();
             const size = 5;
+            gameboard.takenCells = new Map();
             expect(gameboard.takenCells.size).toBe(0);
             const ship = new Ship({
                 length: size,
@@ -116,6 +120,7 @@ describe("GameBoard", () => {
         let gameboard: GameBoard | null = null;
         beforeEach(() => {
             gameboard = new GameBoard();
+            gameboard.ships = new Map();
             gameboard.placeShip({
                 shipType: "cruiser",
                 coords: { x: 2, y: 1 },
@@ -170,7 +175,7 @@ describe("GameBoard", () => {
     describe("defeat check", () => {
         it("should report whether or not all of the ships have been sunk.", () => {
             const gameboard = new GameBoard();
-
+            gameboard.ships = new Map();
             const ships: { type: ShipType; coords: TCoords }[] = [
                 {
                     type: "cruiser",
@@ -195,5 +200,13 @@ describe("GameBoard", () => {
 
             expect(gameboard.hasLost()).toBe(true);
         });
+    });
+    it("should randomly place ships", () => {
+        const gameboard = new GameBoard();
+        const oldShips = gameboard.ships;
+        gameboard.randomlyPlaceShips();
+        const newShips = gameboard.ships;
+        expect(isGameboardValid(gameboard)).toBe(true);
+        expect(oldShips).not.toMatchObject(newShips);
     });
 });
