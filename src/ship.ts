@@ -1,29 +1,35 @@
-import { Direction, TCoords } from "@/types/type";
-import { directionTypes } from "@/consts";
+import { Direction, ShipType, TCoords } from "@/types/type";
+import { directionTypes, shipsLength } from "@/consts";
 import Coords from "@/coords";
 
 export default class Ship {
-    public length: number = 0;
+    readonly length: number = 0;
+    public type: ShipType;
     beenHitTimes: number = 0;
     coords: Coords;
     public direction: Direction = "hor";
     constructor({
         coords,
-        length,
+        type,
         direction,
     }: {
         coords: TCoords;
         direction: Direction;
-        length: number;
+        type: ShipType;
     }) {
-        if (length < 2)
+        if (!Object.keys(shipsLength).includes(type))
+            throw new Error("Invalid ship type");
+        this.type = type;
+
+        this.length = shipsLength[type];
+        if (this.length < 2)
             throw new Error("Length should more than or equal to 2");
 
         if (!directionTypes.includes(direction))
             throw new Error("Invalid direction type");
 
         this.coords = new Coords(coords);
-        this.length = length;
+
         this.direction = direction;
     }
 

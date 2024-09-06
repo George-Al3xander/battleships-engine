@@ -1,4 +1,6 @@
 import Ship from "@/ship";
+import { ShipType } from "@/types/type";
+import { shipsLength } from "@/consts";
 
 describe("Ship class", () => {
     it("should be truthy", () => {
@@ -9,16 +11,17 @@ describe("Ship class", () => {
             () =>
                 new Ship({
                     coords: { x: 1, y: 4 },
-                    length: 1,
+                    //@ts-ignore
+                    type: "bad type",
                     direction: "hor",
                 }),
-        ).toThrow("Length should more than or equal to 2");
+        ).toThrow("Invalid ship type");
 
         expect(
             () =>
                 new Ship({
                     coords: { x: -2, y: 1 },
-                    length: 4,
+                    type: "cruiser",
                     direction: "hor",
                 }),
         ).toThrow("X should be greater than 0");
@@ -27,7 +30,7 @@ describe("Ship class", () => {
             () =>
                 new Ship({
                     coords: { x: 1, y: -40 },
-                    length: 4,
+                    type: "battleship",
                     direction: "hor",
                 }),
         ).toThrow("Y should be greater than 0");
@@ -36,7 +39,7 @@ describe("Ship class", () => {
             () =>
                 new Ship({
                     coords: { x: 12, y: 10 },
-                    length: 4,
+                    type: "battleship",
                     direction: "hor",
                 }),
         ).toThrow("X should be less than or equal to 10");
@@ -45,7 +48,7 @@ describe("Ship class", () => {
             () =>
                 new Ship({
                     coords: { x: 10, y: 12 },
-                    length: 4,
+                    type: "battleship",
                     direction: "hor",
                 }),
         ).toThrow("Y should be less than or equal to 10");
@@ -54,7 +57,7 @@ describe("Ship class", () => {
             () =>
                 new Ship({
                     coords: { x: 10, y: 10 },
-                    length: 4,
+                    type: "battleship",
                     //@ts-ignore
                     direction: "invalid",
                 }),
@@ -64,7 +67,7 @@ describe("Ship class", () => {
     it("should have default properties", () => {
         const ship = new Ship({
             coords: { x: 1, y: 4 },
-            length: 4,
+            type: "battleship",
             direction: "hor",
         });
         const correctProperties = [
@@ -84,13 +87,13 @@ describe("Ship class", () => {
     it("should iterate through the coordinates", () => {
         const ship_1 = new Ship({
             direction: "hor",
-            length: 4,
+            type: "battleship",
             coords: { x: 1, y: 1 },
         });
 
         const ship_2 = new Ship({
             direction: "vert",
-            length: 2,
+            type: "cruiser",
             coords: { x: 1, y: 3 },
         });
 
@@ -110,10 +113,11 @@ describe("Ship class", () => {
     });
 
     it("should change isSunk after ship been fully hit", () => {
-        const length = 4;
+        const type: ShipType = "battleship";
+        const length = shipsLength[type];
         const ship = new Ship({
             coords: { x: 1, y: 4 },
-            length,
+            type,
             direction: "hor",
         });
 

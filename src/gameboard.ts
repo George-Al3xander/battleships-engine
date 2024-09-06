@@ -16,13 +16,13 @@ export default class GameBoard {
     takenCells: Map<string, ShipType> = new Map();
     missed: Map<string, boolean> = generateGameBoardCells();
 
-    constructor(ships?: Map<ShipType, Ship>) {
+    constructor(ships?: Ship[]) {
         if (ships) {
-            this.ships = ships;
+            ships.forEach((ship) => this.ships.set(ship.type, ship));
             this.ships.forEach((...params) =>
                 this.fillTakenCellsWithShip(...params),
             );
-        } else this.randomlyPlaceShips();
+        } //else this.randomlyPlaceShips();
     }
 
     private fillTakenCellsWithShip(
@@ -55,21 +55,15 @@ export default class GameBoard {
         } else missCb();
     }
 
-    public placeShip({
-        shipType,
-        ...params
-    }: {
-        shipType: ShipType;
+    public placeShip(params: {
+        type: ShipType;
         coords: TCoords;
         direction: Direction;
     }) {
         this.inspectCoordsInShips({
             coords: params.coords,
             missCb: () => {
-                const newShip = new Ship({
-                    length: shipsLength[shipType],
-                    ...params,
-                });
+                const newShip = new Ship(params);
                 for (const coords of newShip) {
                     if (this.takenCells.has(coords.toString())) {
                         throw new Error(
@@ -77,8 +71,8 @@ export default class GameBoard {
                         );
                     }
                 }
-                this.ships.set(shipType, newShip);
-                this.fillTakenCellsWithShip(newShip, shipType);
+                this.ships.set(params.type, newShip);
+                this.fillTakenCellsWithShip(newShip, params.type);
             },
             matchCb: () => {
                 throw new Error(
@@ -114,10 +108,10 @@ export default class GameBoard {
     }
 
     public randomlyPlaceShip({
-        shipType,
+        type,
         direction = generateRandomDir(),
     }: {
-        shipType: ShipType;
+        type: ShipType;
         direction?: Direction;
     }) {
         if (this.takenCells.size > 0) {
@@ -127,19 +121,17 @@ export default class GameBoard {
                 if (!this.takenCells.has(cell)) emptyCells.push(cell);
             }
 
-            const shipLength = shipsLength[shipType];
-
             const possibleStarts = emptyCells.filter((str) => {
                 const { x, y } = convertStringToCoords(str);
                 const newShip = new Ship({
                     coords: { x, y },
                     direction,
-                    length: shipLength,
+                    type,
                 });
                 let isValid = true;
 
-                if (direction === "hor") isValid = x + shipLength <= 10;
-                else isValid = y + shipLength <= 10;
+                if (direction === "hor") isValid = x + shipsLength[type] <= 10;
+                else isValid = y + shipsLength[type] <= 10;
 
                 if (isValid) {
                     for (const coord of newShip) {
@@ -154,7 +146,7 @@ export default class GameBoard {
 
             if (possibleStarts.length === 0) {
                 this.randomlyPlaceShip({
-                    shipType,
+                    type,
                     direction: directionTypes.find((dir) => dir !== direction),
                 });
             } else {
@@ -164,20 +156,20 @@ export default class GameBoard {
                 if (!randomStart) throw new Error("No available space");
 
                 this.placeShip({
-                    shipType,
+                    type,
                     coords: convertStringToCoords(randomStart),
                     direction,
                 });
             }
         } else {
-            generateRandomShip({ gameboard: this, shipType });
+            generateRandomShip({ gameboard: this, shipType: type });
         }
     }
 
     randomlyPlaceShips() {
         this.ships = new Map();
-        (Object.keys(shipsLength) as ShipType[]).forEach((shipType) =>
-            this.randomlyPlaceShip({ shipType }),
+        (Object.keys(shipsLength) as ShipType[]).forEach((type) =>
+            this.randomlyPlaceShip({ type }),
         );
     }
 }

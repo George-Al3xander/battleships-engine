@@ -2,15 +2,13 @@ import GameBoard from "@/gameboard";
 import Ship from "@/ship";
 import { ShipType, TCoords } from "@/types/type";
 import { shipsLength } from "@/consts";
-import Player from "@/player";
 import { isGameboardValid } from "@/utils";
 
 describe("GameBoard", () => {
     it("should place a ship", () => {
         const gameboard = new GameBoard();
-        gameboard.ships = new Map();
         gameboard.placeShip({
-            shipType: "cruiser",
+            type: "cruiser",
             coords: { x: 1, y: 4 },
             direction: "hor",
         });
@@ -25,16 +23,15 @@ describe("GameBoard", () => {
 
     it("should throw the ship overlap error", () => {
         const gameboard = new GameBoard();
-        gameboard.ships = new Map();
         gameboard.placeShip({
-            shipType: "cruiser",
+            type: "cruiser",
             coords: { x: 1, y: 4 },
             direction: "hor",
         });
 
         try {
             gameboard.placeShip({
-                shipType: "cruiser",
+                type: "cruiser",
                 coords: { x: 2, y: 4 },
                 direction: "vert",
             });
@@ -49,12 +46,12 @@ describe("GameBoard", () => {
     describe("utils", () => {
         it("should fill taken cells with  ship coordinates", () => {
             const gameboard = new GameBoard();
-            gameboard.ships = new Map();
-            const size = 5;
+            const type: ShipType = "aircraft_carrier";
+            const size = shipsLength[type];
             gameboard.takenCells = new Map();
             expect(gameboard.takenCells.size).toBe(0);
             const ship = new Ship({
-                length: size,
+                type,
                 coords: { x: 1, y: 4 },
                 direction: "hor",
             });
@@ -71,26 +68,19 @@ describe("GameBoard", () => {
         });
 
         it("should inspect", () => {
-            const gameboard = new GameBoard(
-                new Map([
-                    [
-                        "cruiser",
-                        new Ship({
-                            length: 2,
-                            direction: "hor",
-                            coords: { x: 1, y: 1 },
-                        }),
-                    ],
-                    [
-                        "battleship",
-                        new Ship({
-                            length: 4,
-                            direction: "vert",
-                            coords: { x: 1, y: 4 },
-                        }),
-                    ],
-                ]),
-            );
+            const gameboard = new GameBoard([
+                new Ship({
+                    type: "cruiser",
+                    direction: "hor",
+                    coords: { x: 1, y: 1 },
+                }),
+
+                new Ship({
+                    type: "battleship",
+                    direction: "vert",
+                    coords: { x: 1, y: 4 },
+                }),
+            ]);
             const matchCb = jest.fn();
             const missCb = jest.fn();
             (gameboard as any).inspectCoordsInShips({
@@ -120,21 +110,20 @@ describe("GameBoard", () => {
         let gameboard: GameBoard | null = null;
         beforeEach(() => {
             gameboard = new GameBoard();
-            gameboard.ships = new Map();
             gameboard.placeShip({
-                shipType: "cruiser",
+                type: "cruiser",
                 coords: { x: 2, y: 1 },
                 direction: "hor",
             });
 
             gameboard.placeShip({
-                shipType: "battleship",
+                type: "battleship",
                 coords: { x: 9, y: 1 },
                 direction: "vert",
             });
 
             gameboard.placeShip({
-                shipType: "submarine",
+                type: "submarine",
                 coords: { x: 4, y: 9 },
                 direction: "hor",
             });
@@ -175,7 +164,6 @@ describe("GameBoard", () => {
     describe("defeat check", () => {
         it("should report whether or not all of the ships have been sunk.", () => {
             const gameboard = new GameBoard();
-            gameboard.ships = new Map();
             const ships: { type: ShipType; coords: TCoords }[] = [
                 {
                     type: "cruiser",
@@ -189,7 +177,7 @@ describe("GameBoard", () => {
 
             ships.forEach(({ type, coords }) => {
                 gameboard.placeShip({
-                    shipType: type,
+                    type,
                     coords,
                     direction: "hor",
                 });

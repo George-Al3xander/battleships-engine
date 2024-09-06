@@ -35,7 +35,7 @@ export const generateRandomShip = ({
         gameboard.placeShip({
             coords,
             direction,
-            shipType,
+            type: shipType,
         });
     } catch (e) {
         generateRandomShip({ gameboard, shipType });
