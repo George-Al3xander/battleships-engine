@@ -1,7 +1,8 @@
 {
     "name": "battleships-engine",
+    "description": "TypeScript engine for the classic game Battleship",
     "license": "MIT",
-    "version": "0.0.1",
+    "version": "0.2.0",
     "main": "dist/index.js",
     "module": "dist/index.mjs",
     "types": "dist/index.dt.ts",
@@ -29,5 +30,6 @@
     },
     "dependencies": {
         "lodash": "^4.17.21"
-    }
+    },
+    "keywords": ["battleship", "game engine","javascript", "typescript"]
 }

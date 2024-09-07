@@ -1,4 +1,4 @@
-# Battleship Engine
+# [Battleship Engine](https://www.npmjs.com/package/battleships-engine)
 
 This TypeScript package is a core engine for implementing the classic game of Battleship. It allows for the creation of game boards, the placement of ships, and tracking of hits and misses, as well as determining when a player has lost.
 
@@ -43,8 +43,8 @@ gameBoard.randomlyPlaceShips();
 ```typescript
 gameBoard.placeShip({
     type: "battleship",
-       coords: { x: 3, y: 5 },
-           direction: "hor", // horizontal
+    coords: { x: 3, y: 5 },
+    direction: "hor", // horizontal
 });
 ```
  #### Receiving an Attack
