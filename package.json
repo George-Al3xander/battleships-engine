@@ -5,9 +5,21 @@
     "author": "George V.",
     "version": "0.2.1",
     "main": "dist/index.js",
-    "module": "dist/index.mjs",
+    "module": "dist/index.cjs",
     "types": "dist/index.dt.ts",
     "type": "module",
+    "exports": {
+        ".": {
+            "import": {
+                "types": "./dist/index.d.ts",
+                "default": "./dist/index.cjs"
+            },
+            "require": {
+                "types": "./dist/index.d.ts",
+                "default": "./dist/index.cjs"
+            }
+        }
+    },
     "scripts": {
         "build": "tsup src/index.ts --format cjs,esm --dts",
         "release": "pnpm run build && changeset publish",
