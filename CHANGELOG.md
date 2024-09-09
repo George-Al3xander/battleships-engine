@@ -1,5 +1,11 @@
 # battleships-engine
 
+## 0.2.4
+
+### Patch Changes
+
+-   40a6d22: Add export of types from the index file.
+
 ## 0.2.3
 
 ### Patch Changes
