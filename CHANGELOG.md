@@ -1,5 +1,11 @@
 # battleships-engine
 
+## 0.2.3
+
+### Patch Changes
+
+-   515c394: Add "exports" field to the package.json
+
 ## 0.2.2
 
 ### Patch Changes
