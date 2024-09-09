@@ -1,5 +1,11 @@
 # battleships-engine
 
+## 0.2.2
+
+### Patch Changes
+
+-   f160a0a: Update tsconfig & package.json
+
 ## 0.2.1
 
 ### Patch Changes
