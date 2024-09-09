@@ -38,5 +38,10 @@
     "dependencies": {
         "lodash": "^4.17.21"
     },
-    "keywords": ["battleship", "game engine","javascript", "typescript"]
+    "keywords": [
+        "battleship",
+        "game engine",
+        "javascript",
+        "typescript"
+    ]
 }

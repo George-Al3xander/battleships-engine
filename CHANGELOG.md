@@ -1,5 +1,11 @@
 # battleships-engine
 
+## 0.2.1
+
+### Patch Changes
+
+-   ef8a861: Update readme and fix config.json
+
 ## 0.1.0
 
 ### Minor Changes
