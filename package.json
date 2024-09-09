@@ -3,7 +3,7 @@
     "description": "TypeScript engine for the classic game Battleship",
     "license": "MIT",
     "author": "George V.",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "main": "dist/index.js",
     "module": "dist/index.mjs",
     "types": "dist/index.dt.ts",
