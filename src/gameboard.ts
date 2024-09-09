@@ -1,7 +1,7 @@
 import { directionTypes, shipsLength } from "@/consts";
 import Ship from "@/ship";
 
-import { TCoords, Direction, ShipType } from "@/types/type";
+import type { TCoords, Direction, ShipType } from "@/types/type";
 import {
     convertStringToCoords,
     generateGameBoardCells,

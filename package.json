@@ -2,10 +2,12 @@
     "name": "battleships-engine",
     "description": "TypeScript engine for the classic game Battleship",
     "license": "MIT",
-    "version": "0.2.0",
+    "author": "George V.",
+    "version": "0.2.1",
     "main": "dist/index.js",
     "module": "dist/index.mjs",
     "types": "dist/index.dt.ts",
+    "type": "module",
     "scripts": {
         "build": "tsup src/index.ts --format cjs,esm --dts",
         "release": "pnpm run build && changeset publish",
@@ -13,6 +15,11 @@
         "format": "pnpm exec prettier --write",
         "test": "jest"
     },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/George-Al3xander/battleships-engine.git"
+    },
+    "homepage": "https://github.com/George-Al3xander/battleships-engine#readme",
     "devDependencies": {
         "@changesets/cli": "^2.27.7",
         "@eslint/js": "^9.9.1",

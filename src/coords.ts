@@ -1,6 +1,6 @@
 import random from "lodash/random";
 import { coordsType } from "@/consts";
-import { TCoords } from "@/types/type";
+import type { TCoords } from "@/types/type";
 
 export default class Coords {
     x: number = random(1, 10);

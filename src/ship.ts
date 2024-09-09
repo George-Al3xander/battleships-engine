@@ -1,4 +1,4 @@
-import { Direction, ShipType, TCoords } from "@/types/type";
+import type { Direction, ShipType, TCoords } from "@/types/type";
 import { directionTypes, shipsLength } from "@/consts";
 import Coords from "@/coords";
 

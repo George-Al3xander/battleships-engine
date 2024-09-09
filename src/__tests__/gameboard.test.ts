@@ -1,6 +1,6 @@
 import GameBoard from "@/gameboard";
 import Ship from "@/ship";
-import { ShipType, TCoords } from "@/types/type";
+import type { ShipType, TCoords } from "@/types/type";
 import { shipsLength } from "@/consts";
 import { isGameboardValid } from "@/utils";
 

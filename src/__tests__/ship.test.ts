@@ -1,5 +1,5 @@
 import Ship from "@/ship";
-import { ShipType } from "@/types/type";
+import type { ShipType } from "@/types/type";
 import { shipsLength } from "@/consts";
 
 describe("Ship class", () => {

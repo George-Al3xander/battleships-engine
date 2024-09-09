@@ -1,5 +1,5 @@
 import random from "lodash/random";
-import { Direction, ShipType, TCoords } from "@/types/type";
+import type { Direction, ShipType, TCoords } from "@/types/type";
 import {
     coordsType,
     directionTypes,
