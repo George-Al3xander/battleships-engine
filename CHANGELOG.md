@@ -1,5 +1,11 @@
 # battleships-engine
 
+## 0.2.6
+
+### Patch Changes
+
+-   abe67a9: Add the "hitTimes" property to the GameBoard class and implement the relevant test.
+
 ## 0.2.5
 
 ### Patch Changes
