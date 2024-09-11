@@ -2,6 +2,9 @@
 
 This TypeScript package is a core engine for implementing the classic game of Battleship. It allows for the creation of game boards, the placement of ships, and tracking of hits and misses, as well as determining when a player has lost.
 
+For the React version of the engine, check out [Battleship Engine for React](https://www.npmjs.com/package/react-battleships-engine), which provides the same functionality via a React hook.
+
+
 ## Features
 
 - Create and manage a game board.
@@ -24,8 +27,7 @@ npm install battleship-ts-engine
 You can import the necessary classes and types from the package:
 
 ```typescript
-import GameBoard from "battleships-engine";
-import { TCoords, ShipType, Direction } from "battleships-engine/types";
+import { GameBoard, TCoords, ShipType, Direction } from "battleships-engine";
 ```
 
 ### Example
