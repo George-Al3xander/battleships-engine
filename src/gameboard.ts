@@ -168,6 +168,7 @@ export default class GameBoard {
 
     randomlyPlaceShips() {
         this.ships = new Map();
+        this.takenCells = new Map();
         (Object.keys(shipsLength) as ShipType[]).forEach((type) =>
             this.randomlyPlaceShip({ type }),
         );

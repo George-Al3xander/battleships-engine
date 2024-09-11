@@ -55,12 +55,8 @@ describe("GameBoard", () => {
                 coords: { x: 1, y: 4 },
                 direction: "hor",
             });
-            for (let i = 0; i < size; i++) {
-                (gameboard as any).fillTakenCellsWithShip(
-                    ship,
-                    "aircraft_carrier",
-                );
-            }
+            (gameboard as any).fillTakenCellsWithShip(ship, "aircraft_carrier");
+
             for (const coord of ship) {
                 expect(gameboard.takenCells.has(coord.toString())).toBe(true);
             }

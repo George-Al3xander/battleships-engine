@@ -34,7 +34,10 @@ export default class Ship {
     }
 
     hit() {
-        this.beenHitTimes = this.beenHitTimes + 1;
+        if (this.beenHitTimes >= this.length) {
+            throw new Error("This ship has already sunk.");
+        }
+        this.beenHitTimes++;
     }
     isSunk() {
         return this.beenHitTimes === this.length;
