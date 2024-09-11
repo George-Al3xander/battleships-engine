@@ -5,8 +5,8 @@ import Coords from "@/coords";
 export default class Ship {
     readonly length: number = 0;
     public type: ShipType;
-    beenHitTimes: number = 0;
-    coords: Coords;
+    public beenHitTimes: number = 0;
+    public coords: Coords;
     public direction: Direction = "hor";
     constructor({
         coords,

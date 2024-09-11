@@ -15,6 +15,7 @@ export default class GameBoard {
     ships: Map<ShipType, Ship> = new Map();
     takenCells: Map<string, ShipType> = new Map();
     missed: Map<string, boolean> = generateGameBoardCells();
+    hitCells: Map<string, boolean> = generateGameBoardCells();
 
     constructor(ships?: Ship[]) {
         if (ships) {
@@ -22,7 +23,7 @@ export default class GameBoard {
             this.ships.forEach((...params) =>
                 this.fillTakenCellsWithShip(...params),
             );
-        } //else this.randomlyPlaceShips();
+        }
     }
 
     private fillTakenCellsWithShip(
@@ -94,7 +95,10 @@ export default class GameBoard {
             const ship = this.ships.get(fromTaken);
 
             if (!ship) throw new Error(`${fromTaken} does not exist`);
-            else ship.hit();
+            else {
+                ship.hit();
+                this.hitCells.set(coordsClass.toString(), true);
+            }
         } else this.missed.set(coordsClass.toString(), true);
     }
 

@@ -4,6 +4,34 @@ import type { ShipType, TCoords } from "@/types/type";
 import { shipsLength } from "@/consts";
 import { isGameboardValid } from "@/utils";
 
+const receiveAttackSetup = (
+    ships: Ship[],
+    extraCoords?: TCoords | TCoords[],
+    spyOnShipHit?: ShipType[],
+) => {
+    const gameboard = new GameBoard(ships);
+    const receiveAttack = jest.spyOn(gameboard, "receiveAttack");
+
+    let spies = undefined;
+    if (spyOnShipHit) {
+        spies = spyOnShipHit.map((type) =>
+            jest.spyOn(gameboard.ships.get(type)!, "hit"),
+        );
+    }
+    for (const ship of ships) {
+        for (const coord of ship) gameboard.receiveAttack(coord);
+    }
+    if (extraCoords) {
+        if (Array.isArray(extraCoords)) {
+            for (const coord of extraCoords) {
+                gameboard.receiveAttack(coord);
+            }
+        } else gameboard.receiveAttack(extraCoords);
+    }
+    if (spies) return { spies, gameboard, receiveAttack };
+    return { gameboard, receiveAttack };
+};
+
 describe("GameBoard", () => {
     it("should place a ship", () => {
         const gameboard = new GameBoard();
@@ -103,56 +131,46 @@ describe("GameBoard", () => {
     });
 
     describe("receiveAttack", () => {
-        let gameboard: GameBoard | null = null;
-        beforeEach(() => {
-            gameboard = new GameBoard();
-            gameboard.placeShip({
-                type: "cruiser",
-                coords: { x: 2, y: 1 },
-                direction: "hor",
-            });
-
-            gameboard.placeShip({
-                type: "battleship",
-                coords: { x: 9, y: 1 },
-                direction: "vert",
-            });
-
-            gameboard.placeShip({
-                type: "submarine",
-                coords: { x: 4, y: 9 },
-                direction: "hor",
-            });
-
-            jest.spyOn(gameboard.ships.get("cruiser")!, "hit");
-            jest.spyOn(gameboard, "receiveAttack");
-
-            gameboard.receiveAttack({ x: 2, y: 1 });
-            gameboard.receiveAttack({ x: 3, y: 1 });
-
-            gameboard.receiveAttack({ x: 4, y: 9 });
-            gameboard.receiveAttack({ x: 5, y: 9 });
-            gameboard.receiveAttack({ x: 6, y: 9 });
-
-            gameboard.receiveAttack({ x: 9, y: 1 });
-            gameboard.receiveAttack({ x: 9, y: 2 });
-            gameboard.receiveAttack({ x: 9, y: 3 });
-            gameboard.receiveAttack({ x: 9, y: 4 });
-
-            gameboard.receiveAttack({ x: 4, y: 10 });
+        let hookRes: ReturnType<typeof receiveAttackSetup> | undefined =
+            undefined;
+        beforeAll(() => {
+            const ships = [
+                new Ship({
+                    type: "cruiser",
+                    coords: { x: 2, y: 1 },
+                    direction: "hor",
+                }),
+                new Ship({
+                    type: "battleship",
+                    coords: { x: 9, y: 1 },
+                    direction: "vert",
+                }),
+                new Ship({
+                    type: "submarine",
+                    coords: { x: 4, y: 9 },
+                    direction: "hor",
+                }),
+            ];
+            hookRes = receiveAttackSetup(ships, { x: 4, y: 10 }, ["cruiser"]);
         });
-        afterEach(() => jest.clearAllMocks());
         it("should call the hit function after the successful receiveAttack call", () => {
+            const { gameboard } = hookRes!;
             const ship = gameboard!.ships.get("cruiser")!;
             expect(ship.hit).toHaveBeenCalledTimes(ship.length);
             expect(gameboard!.receiveAttack).toHaveBeenCalledTimes(10);
         });
 
         it("should sunk the ship", () => {
+            const { gameboard } = hookRes!;
             expect(gameboard!.ships.get("cruiser")?.isSunk()).toBe(true);
             expect(gameboard!.ships.get("cruiser")?.beenHitTimes).toBe(2);
         });
+        it("should add the coordinates to the 'hitCells' array", () => {
+            const { gameboard } = hookRes!;
+            expect(gameboard!.hitCells.get("(3,1)")).toBe(true);
+        });
         it("should add the coordinates to the 'missed' array", () => {
+            const { gameboard } = hookRes!;
             expect(gameboard!.missed.get("(4,10)")).toBe(true);
         });
     });
