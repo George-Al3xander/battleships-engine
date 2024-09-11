@@ -1,5 +1,11 @@
 # battleships-engine
 
+## 0.2.5
+
+### Patch Changes
+
+-   851df59: Add validation for 'beenHitTimes' in the 'hit' method. Also, add a reset for the 'takenCells' map in the 'randomlyPlaceShips' method.
+
 ## 0.2.4
 
 ### Patch Changes
