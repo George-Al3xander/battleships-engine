@@ -70,24 +70,27 @@ export const convertStringToCoords = (str: string): TCoords => {
 };
 
 export const isGameboardValid = (gameboard: GameBoard) => {
-    let isMatch = false;
-    if (gameboard.ships.size <= 4) return false;
+    const { ships } = gameboard;
+    let isValid = false;
+    if (ships.size <= 4) return false;
     else {
-        gameboard.ships.forEach((currentShip, currentShipType) => {
-            for (const [anyShipType, anyShip] of gameboard.ships.entries()) {
-                if (currentShipType != anyShipType) {
-                    for (const anyShipCoords of anyShip) {
-                        for (const currentShipCoords of currentShip) {
-                            isMatch =
+        for (const [currentShipType, currentShip] of ships.entries()) {
+            for (const [anyShipType, anyShip] of ships.entries()) {
+                if (currentShipType !== anyShipType) {
+                    for (const currentShipCoords of currentShip) {
+                        for (const anyShipCoords of anyShip) {
+                            isValid =
                                 anyShipCoords.toString() !==
                                 currentShipCoords.toString();
-                            if (isMatch) break;
+                            if (!isValid) break;
                         }
-                        if (isMatch) break;
+                        if (!isValid) break;
                     }
+                    if (!isValid) break;
                 }
             }
-        });
+            if (!isValid) break;
+        }
     }
-    return isMatch;
+    return isValid;
 };

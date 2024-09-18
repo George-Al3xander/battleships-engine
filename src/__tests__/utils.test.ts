@@ -66,7 +66,7 @@ it("should check gameboard", () => {
         }),
         new Ship({
             type: "battleship",
-            direction: "vert",
+            direction: "hor",
             coords: { x: 1, y: 4 },
         }),
         new Ship({
