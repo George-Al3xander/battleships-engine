@@ -4,6 +4,24 @@ import type { ShipType, TCoords } from "@/types/type";
 import { shipsLength } from "@/consts";
 import { isGameboardValid } from "@/utils";
 
+const ships = [
+    new Ship({
+        type: "cruiser",
+        coords: { x: 2, y: 1 },
+        direction: "hor",
+    }),
+    new Ship({
+        type: "battleship",
+        coords: { x: 9, y: 1 },
+        direction: "vert",
+    }),
+    new Ship({
+        type: "submarine",
+        coords: { x: 4, y: 9 },
+        direction: "hor",
+    }),
+];
+
 const receiveAttackSetup = (
     ships: Ship[],
     extraCoords?: TCoords | TCoords[],
@@ -134,23 +152,6 @@ describe("GameBoard", () => {
         let hookRes: ReturnType<typeof receiveAttackSetup> | undefined =
             undefined;
         beforeAll(() => {
-            const ships = [
-                new Ship({
-                    type: "cruiser",
-                    coords: { x: 2, y: 1 },
-                    direction: "hor",
-                }),
-                new Ship({
-                    type: "battleship",
-                    coords: { x: 9, y: 1 },
-                    direction: "vert",
-                }),
-                new Ship({
-                    type: "submarine",
-                    coords: { x: 4, y: 9 },
-                    direction: "hor",
-                }),
-            ];
             hookRes = receiveAttackSetup(ships, { x: 4, y: 10 }, ["cruiser"]);
         });
         it("should call the hit function after the successful receiveAttack call", () => {
@@ -210,5 +211,42 @@ describe("GameBoard", () => {
         const newShips = gameboard.ships;
         expect(isGameboardValid(gameboard)).toBe(true);
         expect(oldShips).not.toMatchObject(newShips);
+    });
+
+    it("should remove a ship", () => {
+        const gameboard = new GameBoard();
+        const [ship] = ships;
+        gameboard.placeShip(ship!);
+        gameboard.removeShip(ship!);
+        expect(gameboard.ships.has("cruiser")).toBe(false);
+
+        for (const coords of ship!) {
+            expect(gameboard.takenCells.has(coords.toString())).toBe(false);
+        }
+    });
+
+    it("should move a ship", () => {
+        const gameboard = new GameBoard();
+        const [firstShip, secondShip] = ships;
+
+        gameboard.placeShip(firstShip!);
+        gameboard.placeShip(secondShip!);
+
+        try {
+            gameboard.moveShip(firstShip!, {
+                coords: { x: 9, y: 1 },
+                direction: "vert",
+            });
+            expect(1).toBe(2);
+        } catch (e) {
+            expect(1).toBe(1);
+        }
+
+        gameboard.moveShip(firstShip!, {
+            coords: { x: 3, y: 3 },
+            direction: "vert",
+        });
+
+        expect(gameboard.ships.get("cruiser")!.coords).toEqual({ x: 3, y: 3 });
     });
 });

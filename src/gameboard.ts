@@ -83,6 +83,21 @@ export default class GameBoard {
         });
     }
 
+    public removeShip(ship: Ship) {
+        this.ships.delete(ship.type);
+        for (const coords of ship) {
+            this.takenCells.delete(coords.toString());
+        }
+    }
+
+    public moveShip(
+        startingShip: Ship,
+        newShipInfo: { coords: TCoords; direction: Direction },
+    ) {
+        this.removeShip(startingShip);
+        this.placeShip({ type: startingShip.type, ...newShipInfo });
+    }
+
     public receiveAttack(coords: TCoords) {
         const coordsClass = new Coords(coords);
         if (this.missed.get(coordsClass.toString()) === true)
