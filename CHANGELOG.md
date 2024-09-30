@@ -1,5 +1,11 @@
 # battleships-engine
 
+## 0.2.7
+
+### Patch Changes
+
+-   Remake the 'isGameboardValid' util to check the gameboard correctly.
+
 ## 0.2.6
 
 ### Patch Changes
