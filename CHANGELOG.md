@@ -1,5 +1,11 @@
 # battleships-engine
 
+## 0.2.8
+
+### Patch Changes
+
+-   95c7c79: Add methods for ship removal and movement to the GameBoard class. Implement tests for the new methods.
+
 ## 0.2.7
 
 ### Patch Changes
